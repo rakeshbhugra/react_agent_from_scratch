@@ -15,20 +15,21 @@ from .tools import AVAILABLE_TOOLS, FUNCTION_MAP
 
 load_dotenv()
 
-MODEL = "openai/gpt-4o-mini"
+MODEL = "openai/gpt-4.1-mini"
 
-SYSTEM_PROMPT = """You are an internet research agent. Your job is to help users find and synthesize information from the web.
+SYSTEM_PROMPT = """You are an internet research agent. You MUST use internet search for ALL questions - never answer from your own knowledge.
 
-You have access to these tools:
+Tools:
 - search_web: Search the internet for information
 - scrape_page: Get detailed content from a specific URL
 - create_plan: Create a research plan for complex tasks
 
-Strategy:
-1. For simple questions, search and answer directly
-2. For complex research, create a plan first
+Rules:
+1. ALWAYS search the web first - never rely on your training data
+2. If the task requires more than one search query, ALWAYS create a plan first
 3. Use scrape_page when you need more details from a search result
 4. Always cite your sources with URLs
+5. If one search doesn't give you the answer, search again with different queries
 
 Be concise and factual."""
 
@@ -110,5 +111,6 @@ def run(user_input: str, max_iterations: int = 10) -> str:
 
 if __name__ == "__main__":
     print("=== Internet Search Agent ===\n")
-    user_prompt = "Compare LangChain vs LlamaIndex for building RAG applications. What are the pros and cons of each? Which should I use for a production system?"
+    # Chained query - needs multiple searches to reach the answer
+    user_prompt = "search and figure out what does comet browser does and then figure out it's competitors"
     _ = run(user_prompt)
