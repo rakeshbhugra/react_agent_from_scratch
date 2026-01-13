@@ -110,4 +110,5 @@ def run(user_input: str, max_iterations: int = 10) -> str:
 
 if __name__ == "__main__":
     print("=== Internet Search Agent ===\n")
-    run("What is the latest news about AI agents?")
+    user_prompt = "Compare LangChain vs LlamaIndex for building RAG applications. What are the pros and cons of each? Which should I use for a production system?"
+    _ = run(user_prompt)
