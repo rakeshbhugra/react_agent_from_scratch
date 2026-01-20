@@ -43,8 +43,23 @@ def act(message):
 
     return results
 
-def observe():
-    pass
+def observe(messages, tool_results, assistant_message):
+    messages.append({"role": "assistant", "content": assistant_message.content, "tool_calls": assistant_message.tool_calls})
+
+    if tool_results is None:
+        return True
+
+    # Add all tool results to message history
+    for tool_call_id, function_name, result in tool_results:
+        messages.append({
+            "role": "tool",
+            "tool_call_id": tool_call_id,
+            "content": result
+        })
+        print(f"  [Tool] {function_name} -> {result}")
+
+    return False
+        
 
 
 system_prompt = """You are an autonomous agent designed to perform tasks based on user instructions. Follow the think-act-observe loop to achieve the goals set by the user.
