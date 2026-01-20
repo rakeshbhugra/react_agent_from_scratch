@@ -10,6 +10,10 @@ tools
 import litellm
 import json
 from .tools import AVAILABLE_TOOLS, FUNCTION_MAP
+import warnings
+
+warnings.filterwarnings("ignore")
+
 
 model = "openai/gpt-4.1-mini"
 
@@ -54,7 +58,7 @@ def observe(messages, tool_results, assistant_message):
         messages.append({
             "role": "tool",
             "tool_call_id": tool_call_id,
-            "content": result
+            "content": str(result)
         })
         print(f"  [Tool] {function_name} -> {result}")
 
@@ -67,7 +71,8 @@ system_prompt = """You are an autonomous agent designed to perform tasks based o
 
 messages = [{"role": "system", "content": system_prompt}]
 
-def run_agent():
+def run_agent(user_input):
+    messages.append({"role": "user", "content": user_input})
     max_iterations = 10
     for _ in range(max_iterations):
         assistant_message = think(messages)
@@ -80,4 +85,5 @@ def run_agent():
             return final_response
 
 if __name__ == "__main__":
-    run_agent()
+    user_input = "What is the sum of 5 and 10, and what is the current weather in New York City?"
+    run_agent(user_input)
