@@ -85,5 +85,6 @@ def run_agent(user_input):
             return final_response
 
 if __name__ == "__main__":
-    user_input = "What is the sum of 5 and 10, and what is the current weather in New York City?"
-    run_agent(user_input)
+    while True:
+        user_input = input("You: ")
+        run_agent(user_input)
