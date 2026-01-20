@@ -8,15 +8,21 @@ The core loop:
         observe()
 """
 
+import warnings
+
 import json
 import litellm
 from dotenv import load_dotenv
 from .tools import AVAILABLE_TOOLS, FUNCTION_MAP
 
+warnings.filterwarnings("ignore")
 load_dotenv()
 
 MODEL = "openai/gpt-4o-mini"
 
+messages = [
+    {"role": "system", "content": "You are a helpful assistant that can use tools to answer user questions."}
+]
 
 def think(messages: list) -> dict:
     """Let the model reason about what to do next."""
@@ -80,8 +86,10 @@ def run(user_input: str, max_iterations: int = 10) -> str:
         act()
         observe()
     """
-    messages = [{"role": "user", "content": user_input}]
-    print(f"User: {user_input}")
+    messages.append(
+        {"role": "user", "content": user_input}
+    )
+    # print(f"User: {user_input}")
 
     for _ in range(max_iterations):
         assistant_message = think(messages)
@@ -98,14 +106,8 @@ def run(user_input: str, max_iterations: int = 10) -> str:
 
 if __name__ == "__main__":
     print("=== ReAct Agent Demo ===\n")
-
-    test_queries = [
-        "What is 25 + 37?",
-        "What is 15 times 8?",
-        "What's the weather in San Francisco?",
-    ]
-
-    for query in test_queries:
-        print("-" * 40)
-        run(query)
-        print()
+    while True:
+        user_input = input("You: ")
+        response = run(user_input)
+        print(f"\nFinal Response: {response}")
+    

@@ -2,7 +2,6 @@
 Tools for the Internet Search Agent.
 """
 
-import json
 import asyncio
 import litellm
 from langchain_community.utilities import SerpAPIWrapper

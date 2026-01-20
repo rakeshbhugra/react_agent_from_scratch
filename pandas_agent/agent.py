@@ -9,9 +9,14 @@ The core loop:
 """
 
 import json
+import warnings
 import litellm
 from dotenv import load_dotenv
 from .tools import AVAILABLE_TOOLS, FUNCTION_MAP
+
+# Suppress litellm's Pydantic serialization warnings
+warnings.filterwarnings("ignore", message="Pydantic serializer warnings")
+
 
 load_dotenv()
 
@@ -19,7 +24,7 @@ MODEL = "openai/gpt-4o-mini"
 
 EXCEL_FILE = "pandas_agent/database.xlsx"
 
-SYSTEM_PROMPT = f"""You are a data analyst. Use Python code to answer questions about the Excel file.
+SYSTEM_PROMPT = f"""You are a data analyst. Think step by step before writing any code.
 
 File: {EXCEL_FILE}
 
@@ -28,17 +33,17 @@ Schema:
 - Amount Due, Due Date, Payment Status
 - User Status, Last Contact, Follow Up Required
 
-Example code:
-```python
-import pandas as pd
-df = pd.read_excel('{EXCEL_FILE}')
-print(df.head())
-```
+Before each action, reason about:
+1. What data do I need to answer this question?
+2. What pandas operations will get me there?
+3. Are there potential issues (case sensitivity, nulls, data types)?
+
+Always explain your thinking, then write the code.
 
 Rules:
 1. Always use pandas to read and analyze the data
 2. Always print() your results
-3. If you get an error, fix your code and try again
+3. If you get an error, analyze what went wrong and fix it
 4. Be precise with column names"""
 
 
@@ -76,6 +81,10 @@ def act(message) -> list[tuple[str, str, str]] | None:
 
 def observe(messages: list, assistant_message, tool_results: list | None) -> bool:
     """Update message history. Returns True if done."""
+    # Display the model's reasoning (Chain of Thought)
+    if assistant_message.content:
+        print(f"\n  [Thought] {assistant_message.content}")
+
     messages.append({
         "role": "assistant",
         "content": assistant_message.content,
@@ -85,7 +94,7 @@ def observe(messages: list, assistant_message, tool_results: list | None) -> boo
     if tool_results is None:
         return True
 
-    for tool_call_id, name, result in tool_results:
+    for tool_call_id, _, result in tool_results:
         messages.append({
             "role": "tool",
             "tool_call_id": tool_call_id,
