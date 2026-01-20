@@ -8,6 +8,8 @@ tools
 
 '''
 import litellm
+import json
+from .tools import AVAILABLE_TOOLS, FUNCTION_MAP
 
 model = "openai/gpt-4.1-mini"
 
@@ -15,15 +17,31 @@ def think(messages: list):
     response = litellm.completion(
         model = model,
         messages=messages,
-        tools=[],
+        tools=AVAILABLE_TOOLS,
         tool_choice="auto"
     )
 
     return response.choices[0].message
     
 
-def act():
-    pass
+def act(message):
+    if not message.tool_calls:
+        return None
+    
+    results = []
+    for tool_call in message.tool_calls:
+        function_name = tool_call.function.name
+        function_args = tool_call.function.arguments
+
+        function_args = json.loads(function_args)
+
+        if function_name in FUNCTION_MAP:
+            result = FUNCTION_MAP[function_name](**function_args)
+            results.append((tool_call.id, function_name, result))
+        else:
+            results.append((tool_call.id, function_name, f"Error: Function {function_name} not found."))
+
+    return results
 
 def observe():
     pass
