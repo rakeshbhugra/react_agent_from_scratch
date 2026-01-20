@@ -50,6 +50,7 @@ AVAILABLE_TOOLS = [
     {"type": "function", "function": litellm.utils.function_to_dict(get_current_weather)}
 ]
 
+# print(json.dumps(AVAILABLE_TOOLS[0], indent=2))
 
 FUNCTION_MAP = {
     "sum_numbers": sum_numbers,
