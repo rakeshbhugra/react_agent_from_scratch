@@ -40,4 +40,4 @@ def get_current_weather(location: str, unit: str = "fahrenheit") -> str:
         "temperature": temp,
         "unit": unit,
         "condition": "sunny"
-    }
+    })
