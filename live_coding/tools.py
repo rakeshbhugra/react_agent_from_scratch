@@ -1,4 +1,5 @@
 import json
+import litellm
 
 def sum_numbers(a: float, b: float) -> float:
     """Add two numbers together and return the sum
@@ -41,3 +42,17 @@ def get_current_weather(location: str, unit: str = "fahrenheit") -> str:
         "unit": unit,
         "condition": "sunny"
     })
+
+# Auto-generate tool schemas from docstrings
+AVAILABLE_TOOLS = [
+    {"type": "function", "function": litellm.utils.function_to_dict(sum_numbers)},
+    {"type": "function", "function": litellm.utils.function_to_dict(multiply_numbers)},
+    {"type": "function", "function": litellm.utils.function_to_dict(get_current_weather)}
+]
+
+
+FUNCTION_MAP = {
+    "sum_numbers": sum_numbers,
+    "multiply_numbers": multiply_numbers,
+    "get_current_weather": get_current_weather
+}
